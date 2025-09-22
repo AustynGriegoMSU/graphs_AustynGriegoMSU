@@ -2,176 +2,55 @@
 
 A Python library that implements Dijkstra's shortest path algorithm for finding shortest paths in weighted graphs.
 
-## 🚀 Features
+# The Shortest Path Problem
 
-- **Dijkstra's Algorithm**: Efficient implementation of Dijkstra's shortest path algorithm
-- **Custom Heap Implementation**: Includes a complete heap queue (priority queue) implementation
-- **Path Reconstruction**: Returns both shortest distances and actual paths
-- **Graph File Support**: Read graphs from formatted text files
-- **Easy to Use**: Simple API for quick integration into your projects
+A graph is a data structure that connects nodes identified by labels. In a graph, a node is normally called **vertex** and the connections between two vertices is called **edge**. The cost to travel through an edge is its **weight**. Below is an example of a weighted graph with 9 vertices. 
 
-## 📦 Installation
+# Dijkstra's Shortest Path Algorithm
 
-Install from PyPI:
+Edsger W. Dijkstra was a Dutch computer scientist that made many contributions to the field, including a solution to the shortest path problem in a graph. The solution discussed here uses a min-heap to store the shortest known distances from the source. Let's look at a step-by-step execution of the algorithm for the example above. 
 
-```bash
-pip install graphs-AustynGriegoMSU
-```
+The algorithm begins by adding the cost to reach the source vertex, which is (of course) 0. We will use the notation (source, weight) to represent that. In the solution for the shortest path problem, the heap uses the weight of an edge to sort the values. A distance list is created to record the cost to reach each of the destinations from source. The distance list is initialized with the maximum possible value for the weight, represented as ∞, except to reach the source, which should be set to zero. 
 
-## 🔧 Usage
+The distances are initialized as: [0, ∞, ∞, ∞, ∞, ∞, ∞, ∞, ∞]
 
-### Basic Usage
+Hint: to represent ∞ in your code use **sys.maxsize**. 
 
-```python
-from graphs_AustynGriegoMSU import sp
+Next, the algorithm will run a loop until the heap becomes empty. At each iteration of that loop, the following steps are taken: 
 
-# Define a graph as an adjacency dictionary
-# Format: {source_node: {destination_node: weight, ...}, ...}
-graph = {
-    0: {1: 4, 2: 2},
-    1: {2: 1, 3: 5},
-    2: {3: 8, 4: 10},
-    3: {4: 2},
-    4: {}
-}
+* the top of the heap (i.e., its smaller element) is removed; 
+* refer to that edge as (u, w), where w represents the best (known) cost to reach node u from source; 
+* next, the algorithm evaluates if the cost to reach each of u's neighbors is better than what is known so far; 
+* for example, if v is one of u's neighbor, then the algorithm checks if the cost to reach node u plus the weight from u to v is smaller than what is recorded in the distance array; 
+* if that is the case, the distance array is updated; 
+* also, if the cost is updated, the algorithm needs to update that cost if edge v is found in the heap. 
 
-# Find shortest paths from source node 0
-distances, paths = sp.dijkstra(graph, source=0)
-
-print("Shortest distances from node 0:")
-print(distances)  # [0, 4, 2, 9, 11]
-
-print("Shortest paths:")
-for destination in paths:
-    print(f"Path to node {destination}: {paths[destination]}")
-```
-
-### Using with Graph Files
-
-The package includes a test script that can read graphs from text files:
-
-```python
-# File format: 
-# First line: number of nodes
-# Following lines: source destination weight
-
-# Example graph.txt:
-# 5
-# 0 1 4
-# 0 2 2
-# 1 2 1
-# 1 3 5
-# 2 3 8
-# 2 4 10
-# 3 4 2
-
-# Run the test script
-python test.py graph.txt
-```
-
-### Custom Heap Operations
-
-The package also provides a complete heap implementation:
-
-```python
-from graphs_AustynGriegoMSU import heapq
-
-# Create and use a heap
-heap = []
-heapq.heappush(heap, 3)
-heapq.heappush(heap, 1)
-heapq.heappush(heap, 4)
-
-smallest = heapq.heappop(heap)  # Returns 1
-print(f"Smallest element: {smallest}")
-```
-
-## 🧮 Algorithm Details
-
-### Dijkstra's Algorithm
-
-The implementation uses Dijkstra's algorithm to find shortest paths from a source node to all other nodes in a weighted graph. 
-
-**Time Complexity**: O((V + E) log V) where V is vertices and E is edges  
-**Space Complexity**: O(V)
-
-**Key Features**:
-- Handles weighted directed graphs
-- Returns both distances and path reconstruction
-- Uses a min-heap for efficient next-node selection
-- Supports graphs with any number of nodes
-
-### Input Format
-
-The graph should be represented as a dictionary where:
-- Keys are source nodes (integers)
-- Values are dictionaries mapping destination nodes to edge weights
-
-```python
-graph = {
-    0: {1: 10, 2: 3},     # Node 0 connects to node 1 (weight 10) and node 2 (weight 3)
-    1: {3: 2},            # Node 1 connects to node 3 (weight 2)
-    2: {1: 4, 3: 8},      # Node 2 connects to node 1 (weight 4) and node 3 (weight 8)
-    3: {}                 # Node 3 has no outgoing edges
-}
-```
-
-### Output Format
-
-The `dijkstra()` function returns a tuple containing:
-
-1. **Distances**: A list where `distances[i]` is the shortest distance from source to node `i`
-2. **Paths**: A dictionary where `paths[i]` is the shortest path from source to node `i`
-
-## 📚 API Reference
-
-### `sp.dijkstra(graph, source)`
-
-Finds shortest paths from a source node to all other nodes.
-
-**Parameters**:
-- `graph` (dict): Graph represented as adjacency dictionary
-- `source` (int): Source node index
-
-**Returns**:
-- `distances` (list): Shortest distances from source to each node
-- `paths` (dict): Shortest paths from source to each node
-
-**Example**:
-```python
-distances, paths = sp.dijkstra(graph, 0)
-```
-
-## 🛠️ Development
-
-### Requirements
-
-- Python >= 3.7
-- No external dependencies
-
-### Testing
-
-Run the included test script:
-
-```bash
-python src/test.py path/to/your/graph/file.txt
-```
-
-### Graph File Format
-
-Create a text file with your graph data:
+For the example, (u, w) = (0, 0) in the first iteration. Nodes 1 and 7 can be reached from u=0 with costs 4 and 8, respectively. Therefore, the distances are updated to [0, 4, ∞, ∞, ∞, ∞, ∞, 8, ∞]. Also, (1, 4) and (7, 8) are added to the heap, which should now look like: 
 
 ```
-5          # Number of nodes
-0 1 4      # Edge from node 0 to node 1 with weight 4
-0 2 2      # Edge from node 0 to node 2 with weight 2
-1 2 1      # Edge from node 1 to node 2 with weight 1
-...
+    (1, 4)
+(7, 8)
 ```
 
-## 📄 License
+On the second iteration, (u, w) = (1, 4).  Nodes 0, 2 and 7 can be reached from u=1 with costs 4, 8 and 11, respectively. The distance to node 2 is updated (with a cost of 4+8=12) and the pair (2, 12) is added to the heap. The distance to node 0 does not get updated because travelling to node 0 through node 1 didn't improve the cost: 4 vs. 0. Also, the distance to node 7 does not get updated because travelling to node 7 through node 1 didn't improve the cost: 15 vs. 8. The heap should now look like: 
 
-This project is licensed under the MIT License.
+```
+    (7, 8)
+(2, 12)    
+```
+
+The distances are now: [0, 4, 12, ∞, ∞, ∞, ∞, 8, -]
+
+On the third iteration, (u, w) = (7, 8).  Nodes 0, 1, 6, and 8 can be reached from u=7 with costs 8, 11, 1 and 7, respectively. The distance to node 6 is updated (with a cost of 8+1=9) and the pair (6, 9) is added to the heap. The distance to node 8 is also updated (with a cost of 8+7=15) and the pair (8, 15) is added to the heap. The heap should now look like: 
+
+```
+    (6, 9)
+(2, 12) (8, 15)  
+```
+
+The distances are now: [0, 4, 12, ∞, ∞, ∞, 9, 8, 15]
+
+The algorithm repeats until the heap becomes empty. At the end of the loop the array of distances should have the lowest costs to reach each of the destinations from the source. 
 
 ## 👨‍💻 Author
 
@@ -179,9 +58,6 @@ This project is licensed under the MIT License.
 Email: agriego4@msudenver.edu  
 GitHub: [AustynGriegoMSU](https://github.com/AustynGriegoMSU)
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📈 Version History
 
